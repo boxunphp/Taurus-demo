@@ -1,0 +1,21 @@
+{
+    "name": "boxunphp/taurus-demo",
+    "description": "Taurus的使用Demo",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Boxun\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jordy",
+            "email": "arno.zheng@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "boxunphp/taurus": "*"
+    }
+}

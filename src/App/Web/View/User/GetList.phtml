@@ -1,0 +1,5 @@
+<ul>
+    <?php foreach($list as $item):?>
+        <li><a href="/user/get_detail?id=<?= $item['id'];?>"><?= $this->escape($item['name']);?></a></li>
+    <?php endforeach;?>
+</ul>
