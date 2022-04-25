@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Test Maker</title>
+
+    <!-- ZUI 标准版压缩后的 CSS 文件 -->
+    <link rel="stylesheet" href="//cdn.bootcdn.net/ajax/libs/zui/1.10.0/css/zui.min.css">
+    <link rel="stylesheet" href="/static/testmaker.css">
+
+    <!-- ZUI Javascript 依赖 jQuery -->
+    <script src="//cdn.bootcdn.net/ajax/libs/zui/1.10.0/lib/jquery/jquery.js"></script>
+    <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+    <script src="//cdn.bootcdn.net/ajax/libs/zui/1.10.0/js/zui.min.js"></script>
+
+    <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
+    <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
+    <!--[if lt IE 9]>
+        <script src="https://fastly.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+        <script src="https://fastly.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <!-- 移动设备上的导航切换按钮 -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                        <span class="sr-only">切换导航</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!-- 品牌名称或logo -->
+                    <a class="navbar-brand" href="your/nice/url">ZUI</a>
+                </div>
+                <div class="collapse navbar-collapse navbar-collapse-example">
+                    <!-- 一般导航项目 -->
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="your/nice/url">项目</a></li>
+                        <li><a href="your/nice/url">需求</a></li>
+                        <!-- 导航中的下拉菜单 -->
+                        <li class="dropdown">
+                        <a href="your/nice/url" class="dropdown-toggle" data-toggle="dropdown">管理 <b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="your/nice/url">任务</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                    <!-- 导航中的表单 -->
+                    <form class="navbar-form navbar-left" role="search">
+                        <div class="form-group">
+                        <input type="text" class="form-control" placeholder="搜索">
+                        </div>
+                        <button type="submit" class="btn btn-default">搜索</button>
+                    </form>
+                    <!-- 右侧的导航项目 -->
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="your/nice/url">帮助</a></li>
+                        <li class="dropdown">
+                        <a href="your/nice/url" class="dropdown-toggle" data-toggle="dropdown">探索 <b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="your/nice/url">敏捷开发</a></li>
+                            <li><a href="your/nice/url">HTML5</a></li>
+                            <li><a href="your/nice/url">Javascript</a></li>
+                            <li class="divider"></li>
+                            <li><a href="your/nice/url">探索宇宙</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <aside class="main-aside">
+            <div class="row">
+                <div class="col-md-3 droppable-item"><i class="icon icon-star icon-3x"></i></div>
+                <div class="col-md-3 droppable-item"><i class="icon icon-star icon-3x"></i></div>
+                <div class="col-md-3 droppable-item"><i class="icon icon-star icon-3x"></i></div>
+                <div class="col-md-3 droppable-item"><i class="icon icon-star icon-3x"></i></div>
+                <div class="col-md-3 droppable-item"><i class="icon icon-star icon-3x"></i></div>
+                <div class="col-md-3 droppable-item"><i class="icon icon-star icon-3x"></i></div>
+                <div class="col-md-3 droppable-item"><i class="icon icon-star icon-3x"></i></div>
+            </div>
+        </aside>
+        <div class="main-content">
+            <div class="container-fluid">
+                <div class="a4 droppable-target">
+
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer></footer>
+
+<script>
+    $(function(){
+        $('.droppable-item').droppable({
+            target: '.droppable-target',
+            start: function() {
+                $('.droppable-target').css('border', '1px solid yellow');
+                // $('#droppableContainer .droppable-target').removeClass('panel-warning').removeClass('panel-success').find('.panel-heading').text('拖动到这里吗？');
+            },
+            drop: function(event) {
+                var msg = '真棒！';
+                $('#droppableContainer .droppable-target').removeClass('panel-success').removeClass('panel-warning');
+                if(event.target) {
+                    event.target.css('border', '1px solid green');
+                    event.target.append('<i class="icon icon-star icon-3x"></i>');
+                    $.zui.messager.show(msg);
+                }
+            },
+            drag: function(event) {
+                if(event.target) event.target.css('border', '1px solid red');
+            }
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<?php include $this->template('Header');?>
+
+<style>
+.main {
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
+.stage {
+    padding: 20px;
+    border: 1px solid #e8e8e8;
+}
+.stage .stage-id {
+    position: absolute; 
+    top: 0;
+    left: 0;
+     
+}
+.item-table {
+    margin: auto;
+    border-collapse: separate;
+    border-spacing: 2px;
+    background-color: #FFFFFF;
+}
+.item-table td {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    /* border: 1px solid blue; */
+    background-color: #64CCFC;
+}
+.item-table td.disabled {
+    background-color: #eee;
+}
+.item-table td.active {
+    background-color: green;
+}
+.mask {
+    position: absolute; 
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.5;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 300px;
+    font-size: 48px;
+}
+</style>
+<header>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse navbar-collapse-example">
+            <div class="toolbar text-center form-inline">
+                <a class="btn btn-default btn-prev" <?php if($prevLastId<=0):?>disabled<?php else:?>href="/caption/stage_list?last_id=<?= $prevLastId;?>"<?php endif;?>>上一页</a>
+                <a class="btn btn-default btn-next" <?php if($lastId<0):?>disabled<?php else:?>href="/caption/stage_list?last_id=<?= $lastId;?>"<?php endif;?>>下一页</a>
+                <button type="button" class="btn btn-default btn-all-first-point">起始点</button>
+                <button type="button" class="btn btn-danger btn-discard-all">全部忽略</button>
+            </div>
+        </div>
+    </div>
+    </nav>
+</header>
+
+<div class="main">
+    <div class="container-fluid">
+        <div class="row">
+            <?php foreach($list as $item):?>
+            <div class="col-xs-12 col-sm-6 col-md-3 stage" data-checked="0" data-first_point_row="<?= $item['road'][0][0];?>" data-first_point_col="<?= $item['road'][0][1];?>" data-id="<?= $item['id'];?>">
+                <table class="item-table">
+                    <tbody>
+                        <?php for($row = $item['rows'] - 1; $row >= 0; $row--):?>
+                        <tr>
+                            <?php for($col = 0; $col < $item['cols']; $col++):?>
+                            <td class="<?php if(!empty($item['map_data'][$row][$col])):?>disabled<?php endif;?> row-<?=$row;?>-col-<?=$col;?>">&nbsp;</td>
+                            <?php endfor;?>
+                        </tr>
+                        <?php endfor;?>
+                    </tbody>
+                </table>
+                <div class="toolbar text-center form-inline" style="margin-top: 40px;">
+                    <select class="form-control" name="level">
+                        <option value="">选择等级</option>
+                        <?php for($i=1;$i<=10;$i++):?>
+                        <option value="<?= $i;?>"><?= $i;?>级</option>
+                        <?php endfor;?>
+                    </select>
+                    <button type="button" class="btn btn-primary btn-adopt">采用</button>
+                    <button type="button" class="btn btn-danger btn-discard">忽略</button>
+                    <button type="button" class="btn btn-default btn-first-point">起始点</button>
+                </div>
+                <div class="mask" style="display: none;">已采用</div>
+                <div class="stage-id">ID: <?= $item['id'];?></div>
+            </div>
+            <?php endforeach;?>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 漂浮信息
+    function show_tip(message, type) {
+        var icon = '';
+        switch (type) {
+            case 'danger':
+                icon = 'exclamation-sign';
+                break;
+            case 'warning':
+                icon = 'warning-sign';
+                break;
+            case 'success':
+                icon = 'ok-sign';
+                break;
+        }
+        new $.zui.Messager(message, {
+            type: type,
+            icon: icon,
+            placement: 'top' // 定义显示位置
+        }).show();
+    }
+    // 忽略
+    function show_discard(stage) {
+        $(stage).siblings('button').prop('disabled', true);
+        $(stage).siblings('select').prop('disabled', true);
+    }
+</script>
+
+<script>
+    var ctrl = false;
+    $(function(){
+        // 采用
+        $('.btn-adopt').click(function(){
+            var $stage = $(this).parents('.stage');
+            var id = $stage.data('id');
+            var level = $(this).siblings('select[name=level]').val();
+            if (level === '') {
+                new $.zui.Messager('请选择等级', {
+                    type: 'warning',
+                    icon: 'warning-sign',
+                    placement: 'top' // 定义显示位置
+                }).show();
+                return;
+            }
+            $.post('/caption/adopt', {id: id, level: level}, function(resp){
+                if (resp.code === 0) {
+                    $stage.find('.mask').show();
+                    $stage.data('checked', 1);
+                    show_tip(resp.message, 'success');
+                } else {
+                    show_tip(resp.message, 'danger');
+                }
+            });
+        });
+        // 忽略
+        $('.btn-discard').click(function(){
+            var $this = $(this);
+            var $stage = $(this).parents('.stage');
+            var id = $(this).parents('.stage').data('id');
+            $.post('/caption/discard', {id: id}, function(resp){
+                if (resp.code === 0) {
+                    $stage.data('checked', 1);
+                    $this.prop('disabled', true);
+                    $this.siblings('button').prop('disabled', true);
+                    $this.siblings('select').prop('disabled', true);
+                    show_tip(resp.message, 'success');
+                } else {
+                    show_tip(resp.message, 'danger');
+                }
+            });
+        });
+        $('.btn-discard-all').click(function(){
+            var ids = [];
+            $('.stage').each(function(i, n){
+                if ($(n).data('checked') == 0) {
+                    ids.push($(n).data('id'));
+                }
+            });
+            if (ids.length <= 0) {
+                show_tip('没有可忽略的项', 'warning');
+                return false;
+            }
+            $.post('/caption/discard', {ids: ids}, function(resp){
+                if (resp.code === 0) {
+                    $('.stage').each(function(i, n){
+                        if ($(n).data('checked') == 0) {
+                            $(n).data('checked', 1);
+                            $(n).find('button').prop('disabled', true);
+                            $(n).find('select').prop('disabled', true);
+                        }
+                    });
+                    show_tip(resp.message, 'success');
+                } else {
+                    show_tip(resp.message, 'danger');
+                }
+            });
+        });
+        // 起始点
+        $('.btn-first-point').click(function(){
+            var $stage = $(this).parents('.stage');
+            var row = $stage.data('first_point_row');
+            var col = $stage.data('first_point_col');
+            $stage.find('.row-' + row + '-col-' + col).addClass('active');
+        });
+        $('.btn-all-first-point').click(function(){
+            $('.stage').each(function(i, n){
+                var row = $(n).data('first_point_row');
+                var col = $(n).data('first_point_col');
+                $(n).find('.row-' + row + '-col-' + col).addClass('active');
+            });
+        });
+        // 监听键盘事件
+        $(document).on('keydown', function(e){
+            if (e.key === 'Control') {
+                ctrl = true;
+            }
+            // 显示忽略按钮
+            if (ctrl && e.key === 'd') {
+                $('.btn-discard').show();
+            }
+            // 显示起始点按钮
+            if (ctrl && e.key === 's') {
+                $('.btn-first-point').show();
+            }
+            // 隐藏按钮
+            if (ctrl && e.key === 'h') {
+                $('.btn-discard').hide();
+                $('.btn-first-point').hide();
+            }
+        });
+        $(document).on('keyup', function(e){
+            if (e.key === 'Control') {
+                ctrl = false;
+            }
+        });
+
+    })
+</script>
+
+<?php include $this->template('Footer');?>

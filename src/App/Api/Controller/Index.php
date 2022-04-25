@@ -5,6 +5,6 @@ class Index extends Controller
 {
     public function main()
     {
-        $this->response()->success();
+        $this->response()->success(['data' => 'DATA']);
     }
 }
